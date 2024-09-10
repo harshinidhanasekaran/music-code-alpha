@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <style>
+        /* Reset some default styles */
+        body, h1, h2, h3, p {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            padding: 20px;
+        }
+
+        .player-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .player-controls button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .player-controls button:hover {
+            background-color: #45a049;
+        }
+
+        .player-controls input[type="range"] {
+            flex-grow: 1;
+            margin: 0 10px;
+        }
+
+        .playlist {
+            margin-bottom: 20px;
+        }
+
+        .playlist input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .playlist select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        #playlist {
+            list-style: none;
+            padding: 0;
+        }
+
+        #playlist li {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.3s;
+        }
+
+        #playlist li:hover {
+            background-color: #f0f0f0;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 20px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="player-container">
+        <div class="player-controls">
+            <button id="playPauseBtn">Play</button>
+            <button id="skipBtn">Skip</button>
+            <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1">
+        </div>
+        <div class="playlist">
+            <input type="text" id="searchInput" placeholder="Search music...">
+            <select id="categorySelect">
+                <option value="">All Categories</option>
+                <option value="pop">Pop</option>
+                <option value="rock">Rock</option>
+                <option value="jazz">Jazz</option>
+            </select>
+            <ul id="playlist"></ul>
+        </div>
+        <audio id="audioPlayer" controls></audio>
+    </div>
+    <script>
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        const volumeControl = document.getElementById('volumeControl');
+        const searchInput = document.getElementById('searchInput');
+        const categorySelect = document.getElementById('categorySelect');
+        const playlistElement = document.getElementById('playlist');
+
+        // Replace these URLs with the actual URLs of your Tamil songs
+        const songs = [
+            { title: 'Song 1 (Tamil)', src: 'https://www.example.com/tamil-song1.mp3', category: 'pop' },
+            { title: 'Song 2 (Tamil)', src: 'https://www.example.com/tamil-song2.mp3', category: 'rock' },
+            { title: 'Song 3 (Tamil)', src: 'https://www.example.com/tamil-song3.mp3', category: 'jazz' }
+        ];
+
+        let currentSongIndex = 0;
+
+        function loadPlaylist() {
+            playlistElement.innerHTML = '';
+            const filteredSongs = songs.filter(song =>
+                song.title.toLowerCase().includes(searchInput.value.toLowerCase()) &&
+                (!categorySelect.value || song.category === categorySelect.value)
+            );
+
+            filteredSongs.forEach((song, index) => {
+                const li = document.createElement('li');
+                li.textContent = song.title;
+                li.addEventListener('click', () => {
+                    currentSongIndex = songs.indexOf(song);
+                    playSong();
+                });
+                playlistElement.appendChild(li);
+            });
+        }
+
+        function playSong() {
+            const song = songs[currentSongIndex];
+            audioPlayer.src = song.src;
+            audioPlayer.play();
+            playPauseBtn.textContent = 'Pause';
+        }
+
+        playPauseBtn.addEventListener('click', () => {
+            if (audioPlayer.paused) {
+                playSong();
+            } else {
+                audioPlayer.pause();
+                playPauseBtn.textContent = 'Play';
+            }
+        });
+
+        skipBtn.addEventListener('click', () => {
+            currentSongIndex = (currentSongIndex + 1) % songs.length;
+            playSong();
+        });
+
+        volumeControl.addEventListener('input', () => {
+            audioPlayer.volume = volumeControl.value;
+        });
+
+        searchInput.addEventListener('input', loadPlaylist);
+        categorySelect.addEventListener('change', loadPlaylist);
+
+        // Initial load
+        loadPlaylist();
+    </script>
+</body>
+</html>
